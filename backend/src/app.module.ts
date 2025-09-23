@@ -1,16 +1,21 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
-import { MongooseModule } from '@nestjs/mongoose';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
-import { User, UserSchema } from './users/user.schema';
+import { User } from './users/user.entity';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/auth-app'),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    TypeOrmModule.forRoot({
+      type: 'sqlite',
+      database: 'database.sqlite',
+      entities: [User],
+      synchronize: true, // Auto-create tables (disable in production)
+    }),
+    TypeOrmModule.forFeature([User]),
     JwtModule.register({
-      secret: 'your-secret-key', // Use environment variable in production
+      secret: 'your-super-secret-key-change-this-in-production',
       signOptions: { expiresIn: '24h' },
     }),
   ],
